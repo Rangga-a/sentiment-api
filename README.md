@@ -1,6 +1,6 @@
 # 🇮🇩 Sentiment Analysis — Rupiah Melemah
 
-Klasifikasi sentimen komentar YouTube berbahasa Indonesia seputar isu pelemahan rupiah, lengkap dengan confidence score per kelas. Dibangun dengan TF-IDF + model Machine Learning klasik, dan web app sederhana.
+Klasifikasi sentimen komentar YouTube berbahasa Indonesia seputar isu pelemahan rupiah, lengkap dengan confidence score per kelas. Dibangun dengan TF-IDF + model Machine Learning klasik, dan web app.
 
 **🔗 Live demo:** [sentiment-api-six.vercel.app](https://sentiment-api-six.vercel.app/)
 
@@ -18,7 +18,7 @@ Alur pengerjaannya:
 4. **Ekstraksi fitur** — teks bersih diubah jadi vektor numerik dengan **TF-IDF**.
 5. **Pemodelan** — 6 model klasik dibandingkan: Naive Bayes, Decision Tree, Random Forest, AdaBoost, Linear SVM, dan Logistic Regression (tuned). Model terbaik dipilih otomatis berdasarkan skor **F1-macro** tertinggi.
 6. **Confidence score** — kalau model terpilih tidak punya `predict_proba` bawaan (mis. Linear SVM), otomatis dikalibrasi dengan `CalibratedClassifierCV` supaya tetap bisa mengeluarkan probabilitas per kelas.
-7. **Deployment** — model diekspor lalu dibungkus jadi API (FastAPI/Flask) dengan web UI sederhana di atasnya, di-deploy ke **Vercel**.
+7. **Deployment** — model diekspor lalu dibungkus jadi API (FastAPI) dengan web UI sederhana di atasnya, di-deploy ke **Vercel**.
 
 ## ✅ Hasil Akhir
 
@@ -28,7 +28,7 @@ Alur pengerjaannya:
 | **Kelas output** | `Negative`, `Neutral`, `Positive` |
 | **Confidence score** | Native dari `predict_proba`, tanpa kalibrasi tambahan |
 
-Angka metrik lengkap (accuracy, precision, recall, F1 per kelas, tabel perbandingan 6 model) ada di output notebook `Sentiment_Analysis_Final.ipynb` bagian perbandingan model.
+Angka metrik lengkap (accuracy, precision, recall, F1 per kelas, tabel perbandingan 6 model) ada di output notebook `sentiment_analysis.ipynb` bagian perbandingan model.
 
 > ⚠️ **Keterbatasan:** karena berbasis TF-IDF + model klasik (bukan transformer end-to-end), model ini **tidak bisa membaca sarkasme/sindiran**. Kalimat positif secara harfiah pun kadang salah diklasifikasi kalau polanya mirip komentar negatif di data training.
 
@@ -77,11 +77,6 @@ uvicorn app:app --reload --host 0.0.0.0 --port 8000
 ```
 Buka `http://localhost:8000/` — dokumentasi API teknis (Swagger) ada di `/docs`.
 
-**Flask:**
-```bash
-python app_flask.py
-```
-Buka `http://localhost:5000/`.
 
 ## 📡 API Reference
 
