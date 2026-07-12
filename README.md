@@ -45,15 +45,17 @@ Angka metrik lengkap (accuracy, precision, recall, F1 per kelas, tabel perbandin
 
 ```
 deployment/
-├── app.py                   # FastAPI app
-├── app_flask.py              # Flask app (alternatif)
-├── preprocessing.py          # preprocessing + loader model (dipakai app.py & app_flask.py)
+├── app.py                           
+├── preprocessing.py         
 ├── requirements.txt
 ├── Dockerfile
 ├── .gitignore
 ├── README.md
+├── notebook/
+│   ├── sentiment_analysis.ipynb          
+│   └── rupiah_melemah.csv
 ├── static/
-│   ├── index.html            # tampilan web (dark theme)
+│   ├── index.html          
 │   └── style.css
 └── model_artifacts/
     ├── model.pkl
