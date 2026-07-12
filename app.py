@@ -1,17 +1,3 @@
-"""
-app.py - FastAPI app untuk sentiment analysis komentar "rupiah melemah"
-
-Cara jalanin lokal:
-    pip install -r requirements.txt
-    uvicorn app:app --reload --host 0.0.0.0 --port 8000
-
-Lalu buka http://localhost:8000/docs untuk coba lewat Swagger UI,
-atau test lewat curl:
-    curl -X POST http://localhost:8000/predict \
-         -H "Content-Type: application/json" \
-         -d '{"text": "kebijakan pemerintah tidak bagus untuk rakyat"}'
-"""
-
 from pathlib import Path
 from typing import Dict, List
 
