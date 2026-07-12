@@ -1,0 +1,37 @@
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment variables / secrets
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Jupyter checkpoints (kalau notebook ikut ditaruh di repo yang sama)
+.ipynb_checkpoints/
+
+# Build/dist artifacts
+build/
+dist/
+*.egg-info/
+
+# Model artifacts besar (uncomment kalau ukurannya > 100MB dan mau pakai Git LFS,
+# atau kalau tidak mau file model ikut ke-push sama sekali)
+# model_artifacts/*.pkl

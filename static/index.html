@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cek Sentimen Komentar</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <h1>Cek Sentimen Komentar</h1>
+      <p class="subtitle">Masukkan komentar berbahasa Indonesia terkait Rupiah.</p>
+
+      <textarea id="text-input" placeholder="Contoh: kebijakan pemerintah tidak bagus untuk rakyat"></textarea>
+      <button id="submit-btn">Analisis Sentimen</button>
+
+      <div class="loading" id="loading">Menganalisis...</div>
+      <div class="error" id="error"></div>
+
+      <div id="result">
+        <span class="label-badge" id="label-badge">
+          <span class="dot"></span>
+          <span id="label-text"></span>
+        </span>
+
+        <div class="score-row" id="score-row"></div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      Developed by
+      <a href="https://github.com/Rangga-a" target="_blank" rel="noopener noreferrer">Rangga-a</a>
+    </footer>
+  </div>
+
+<script>
+  const COLORS = {
+    "negative": "#f87171",
+    "neutral": "#9ca3af",
+    "positive": "#4ade80",
+  };
+
+  const input = document.getElementById("text-input");
+  const btn = document.getElementById("submit-btn");
+  const loading = document.getElementById("loading");
+  const errorBox = document.getElementById("error");
+  const result = document.getElementById("result");
+  const labelBadge = document.getElementById("label-badge");
+  const labelText = document.getElementById("label-text");
+  const scoreRow = document.getElementById("score-row");
+
+  function colorFor(label) {
+    return COLORS[label.toLowerCase()] || "#9ca3af";
+  }
+
+  async function analyze() {
+    const text = input.value.trim();
+    errorBox.style.display = "none";
+    result.style.display = "none";
+
+    if (!text) {
+      errorBox.textContent = "Teks tidak boleh kosong.";
+      errorBox.style.display = "block";
+      return;
+    }
+
+    btn.disabled = true;
+    loading.style.display = "block";
+
+    try {
+      const res = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || err.error || "Gagal menganalisis teks.");
+      }
+
+      const data = await res.json();
+      renderResult(data);
+    } catch (e) {
+      errorBox.textContent = e.message || "Terjadi kesalahan.";
+      errorBox.style.display = "block";
+    } finally {
+      btn.disabled = false;
+      loading.style.display = "none";
+    }
+  }
+
+  function renderResult(data) {
+    const color = colorFor(data.label);
+    labelBadge.style.background = color;
+    labelText.textContent = `${data.label} — ${(data.confidence * 100).toFixed(1)}%`;
+
+    scoreRow.innerHTML = "";
+    const entries = Object.entries(data.all_scores).sort((a, b) => b[1] - a[1]);
+    for (const [cls, score] of entries) {
+      const pct = (score * 100).toFixed(1);
+      const item = document.createElement("div");
+      item.className = "score-item";
+      item.innerHTML = `
+        <div class="score-header">
+          <span>${cls}</span>
+          <span>${pct}%</span>
+        </div>
+        <div class="bar-bg">
+          <div class="bar-fill" style="width:${pct}%; background:${colorFor(cls)}"></div>
+        </div>
+      `;
+      scoreRow.appendChild(item);
+    }
+
+    result.style.display = "block";
+  }
+
+  btn.addEventListener("click", analyze);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) analyze();
+  });
+</script>
+</body>
+</html>
