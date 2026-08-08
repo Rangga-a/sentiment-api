@@ -10,7 +10,7 @@ Klasifikasi sentimen komentar YouTube berbahasa Indonesia seputar isu pelemahan 
 
 ![Dashboard](assets/dashboard.png)
 
-##Perbandingan Model
+## Perbandingan Model
 
 ![Model](assets/model.png)
 
