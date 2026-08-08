@@ -59,6 +59,7 @@ deployment/
 │   └── style.css
 └── model_artifacts/
     ├── model.pkl
+    ├── model_info.pkl
     ├── tfidf_vectorizer.pkl
     └── preprocessing_assets.pkl
 ```
