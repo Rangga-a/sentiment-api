@@ -1,4 +1,4 @@
-# 🇮🇩 Sentiment Analysis — Rupiah Melemah
+# Sentiment Analysis — Rupiah Melemah
 
 Klasifikasi sentimen komentar YouTube berbahasa Indonesia seputar isu pelemahan rupiah, lengkap dengan confidence score per kelas. Dibangun dengan TF-IDF + model Machine Learning klasik, dan web app.
 
@@ -38,7 +38,7 @@ Alur pengerjaannya:
 
 Angka metrik lengkap (accuracy, precision, recall, F1 per kelas, tabel perbandingan 6 model) ada di output notebook `sentiment_analysis.ipynb` bagian perbandingan model.
 
-> ⚠️ **Keterbatasan:** karena berbasis TF-IDF + model klasik (bukan transformer end-to-end), model ini **tidak bisa membaca sarkasme/sindiran**. Kalimat positif secara harfiah pun kadang salah diklasifikasi kalau polanya mirip komentar negatif di data training.
+> **Keterbatasan:** karena berbasis TF-IDF + model klasik (bukan transformer end-to-end), model ini **tidak bisa membaca sarkasme/sindiran**. Kalimat positif secara harfiah pun kadang salah diklasifikasi kalau polanya mirip komentar negatif di data training.
 
 ## Tech Stack
 
@@ -46,8 +46,6 @@ Angka metrik lengkap (accuracy, precision, recall, F1 per kelas, tabel perbandin
 - **Backend:** FastAPI
 - **Frontend:** HTML, CSS
 - **Deployment:** Vercel
-
-## Struktur Folder
 
 ## Struktur folder
 
