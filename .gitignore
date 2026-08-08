@@ -1,12 +1,21 @@
+<<<<<<< HEAD
+=======
+# Virtual environment
+>>>>>>> 7aee6b7698f78f471f9f59ced2af70910d2473b2
 venv/
 env/
 .venv/
 
+<<<<<<< HEAD
+=======
+# Python cache
+>>>>>>> 7aee6b7698f78f471f9f59ced2af70910d2473b2
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
+<<<<<<< HEAD
 .env
 .env.local
 
@@ -16,10 +25,32 @@ Thumbs.db
 .vscode/
 .idea/
 
+=======
+# Environment variables / secrets
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Logs
+>>>>>>> 7aee6b7698f78f471f9f59ced2af70910d2473b2
 *.log
 
 .ipynb_checkpoints/
 
+<<<<<<< HEAD
 build/
 dist/
 *.egg-info/
+=======
+# Build/dist artifacts
+build/
+dist/
+*.egg-info/
+>>>>>>> 7aee6b7698f78f471f9f59ced2af70910d2473b2
