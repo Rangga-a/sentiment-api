@@ -22,8 +22,6 @@ def load_artifacts():
             "sudah ditaruh di folder deployment/model_artifacts/."
         ) from e
 
-    # model_info.pkl bersifat opsional (mis. kalau export dari notebook versi lama
-    # belum menyimpannya). Kalau tidak ada, info model diturunkan dari objek model itu sendiri.
     model_info_path = os.path.join(ARTIFACT_DIR, "model_info.pkl")
     if os.path.exists(model_info_path):
         with open(model_info_path, "rb") as f:
@@ -32,7 +30,12 @@ def load_artifacts():
         model_info = {
             "model_name": type(model).__name__,
             "classes": list(model.classes_) if hasattr(model, "classes_") else None,
+            "dataset": None,
+            "features": None,
+            "metrics": None,
         }
+    for key in ("dataset", "features", "metrics"):
+        model_info.setdefault(key, None)
 
     if not hasattr(model, "predict_proba"):
         raise RuntimeError(
@@ -111,7 +114,6 @@ def stemming(tokens) -> str:
 
 
 def preprocess(text: str) -> str:
-    """Pipeline preprocessing lengkap: emoji -> cleaning -> tokenize -> slang -> negasi -> stopword -> stemming."""
     text = remove_emoji(text)
     text = cleaning(text)
     tokens = tokenize(text)
@@ -122,7 +124,6 @@ def preprocess(text: str) -> str:
 
 
 def predict_with_confidence(text: str) -> dict:
-    """Preprocess teks, prediksi label, dan hitung confidence score (probabilitas per kelas)."""
     clean_text = preprocess(text)
     vec = TFIDF.transform([clean_text])
     proba = MODEL.predict_proba(vec)[0]

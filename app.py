@@ -1,25 +1,9 @@
-"""
-app.py - FastAPI app untuk sentiment analysis komentar "rupiah melemah"
-
-Cara jalanin lokal:
-    pip install -r requirements.txt
-    uvicorn app:app --reload --host 0.0.0.0 --port 8000
-
-Lalu buka http://localhost:8000/docs untuk coba lewat Swagger UI,
-atau test lewat curl:
-    curl -X POST http://localhost:8000/predict \
-         -H "Content-Type: application/json" \
-         -d '{"text": "kebijakan pemerintah tidak bagus untuk rakyat"}'
-"""
-
 from pathlib import Path
 from typing import Dict, List
-
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
-
 from preprocessing import MODEL_INFO, predict_with_confidence
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -54,7 +38,6 @@ class PredictResult(BaseModel):
 
 @app.get("/")
 def home():
-    """Halaman web sederhana: input teks -> hasil sentimen + confidence score."""
     return FileResponse(BASE_DIR / "static" / "index.html")
 
 
@@ -65,6 +48,17 @@ def api_info():
         "model": MODEL_INFO.get("model_name"),
         "classes": MODEL_INFO.get("classes"),
         "docs": "/docs",
+    }
+
+
+@app.get("/model-info")
+def model_info():
+    return {
+        "model_name": MODEL_INFO.get("model_name"),
+        "classes": MODEL_INFO.get("classes"),
+        "dataset": MODEL_INFO.get("dataset"),
+        "features": MODEL_INFO.get("features"),
+        "metrics": MODEL_INFO.get("metrics"),
     }
 
 

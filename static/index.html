@@ -3,124 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cek Sentimen Komentar</title>
+<title>Sentimen Rupiah</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-  <div class="page">
-    <div class="card">
-      <h1>Cek Sentimen Komentar</h1>
-      <p class="subtitle">Masukkan komentar berbahasa Indonesia terkait Rupiah.</p>
+<main class="card">
 
-      <textarea id="text-input" placeholder="Contoh: kebijakan pemerintah tidak bagus untuk rakyat"></textarea>
-      <button id="submit-btn">Analisis Sentimen</button>
+  <h1>Cek Sentimen Komentar</h1>
+  <p class="subtitle">Masukkan komentar berbahasa Indonesia terkait rupiah.</p>
 
-      <div class="loading" id="loading">Menganalisis...</div>
-      <div class="error" id="error"></div>
+  <textarea id="text-input" placeholder="kebijakan pemerintah tidak bagus untuk rakyat"></textarea>
+  <button id="submit-btn">Analisis</button>
 
-      <div id="result">
-        <span class="label-badge" id="label-badge">
-          <span class="dot"></span>
-          <span id="label-text"></span>
-        </span>
+  <p class="status" id="loading">Menganalisis…</p>
+  <p class="status status--error" id="error"></p>
 
-        <div class="score-row" id="score-row"></div>
-      </div>
-    </div>
-
-    <footer class="footer">
-      Developed by
-      <a href="https://github.com/Rangga-a" target="_blank" rel="noopener noreferrer">Rangga-a</a>
-    </footer>
+  <div class="result" id="result">
+    <p class="result__line">
+      <span id="label-text">Positif</span>
+      <span id="pct-text">92.1%</span>
+    </p>
+    <p class="result__detail" id="score-detail"></p>
   </div>
 
+  <hr>
+
+  <div class="info-row"><span>Dataset</span><span id="info-dataset">—</span></div>
+  <div class="info-row"><span>Model</span><span id="info-model">—</span></div>
+  <div class="info-row"><span>Fitur</span><span id="info-features">—</span></div>
+  <div class="info-row"><span>Akurasi</span><span id="info-accuracy">—</span></div>
+  <p class="info-note" id="info-note"></p>
+
+  <footer>
+    <a href="https://github.com/Rangga-a" target="_blank" rel="noopener noreferrer">Rangga-a</a>
+  </footer>
+
+</main>
+
 <script>
-  const COLORS = {
-    "negative": "#f87171",
-    "neutral": "#9ca3af",
-    "positive": "#4ade80",
-  };
+const SENT = {
+  negative: { cls: 'down', id: 'Negatif' },
+  neutral: { cls: 'flat', id: 'Netral' },
+  positive: { cls: 'up', id: 'Positif' },
+};
+const ORDER = ['Negative', 'Neutral', 'Positive'];
 
-  const input = document.getElementById("text-input");
-  const btn = document.getElementById("submit-btn");
-  const loading = document.getElementById("loading");
-  const errorBox = document.getElementById("error");
-  const result = document.getElementById("result");
-  const labelBadge = document.getElementById("label-badge");
-  const labelText = document.getElementById("label-text");
-  const scoreRow = document.getElementById("score-row");
+const input = document.getElementById('text-input');
+const btn = document.getElementById('submit-btn');
+const loading = document.getElementById('loading');
+const errorBox = document.getElementById('error');
+const result = document.getElementById('result');
+const labelEl = document.getElementById('label-text');
+const pctEl = document.getElementById('pct-text');
+const detailEl = document.getElementById('score-detail');
 
-  function colorFor(label) {
-    return COLORS[label.toLowerCase()] || "#9ca3af";
+function sentMeta(label) {
+  return SENT[label.toLowerCase()] || { cls: 'flat', id: label };
+}
+
+async function analyze() {
+  const text = input.value.trim();
+  errorBox.style.display = 'none';
+  result.classList.remove('is-visible');
+
+  if (!text) {
+    errorBox.textContent = 'Teks tidak boleh kosong.';
+    errorBox.style.display = 'block';
+    return;
   }
 
-  async function analyze() {
-    const text = input.value.trim();
-    errorBox.style.display = "none";
-    result.style.display = "none";
+  btn.disabled = true;
+  loading.style.display = 'block';
 
-    if (!text) {
-      errorBox.textContent = "Teks tidak boleh kosong.";
-      errorBox.style.display = "block";
-      return;
+  try {
+    const res = await fetch('/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Gagal menganalisis teks.');
     }
 
-    btn.disabled = true;
-    loading.style.display = "block";
-
-    try {
-      const res = await fetch("/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || err.error || "Gagal menganalisis teks.");
-      }
-
-      const data = await res.json();
-      renderResult(data);
-    } catch (e) {
-      errorBox.textContent = e.message || "Terjadi kesalahan.";
-      errorBox.style.display = "block";
-    } finally {
-      btn.disabled = false;
-      loading.style.display = "none";
-    }
+    renderResult(await res.json());
+  } catch (e) {
+    errorBox.textContent = e.message;
+    errorBox.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    loading.style.display = 'none';
   }
+}
 
-  function renderResult(data) {
-    const color = colorFor(data.label);
-    labelBadge.style.background = color;
-    labelText.textContent = `${data.label} — ${(data.confidence * 100).toFixed(1)}%`;
+function renderResult(data) {
+  const meta = sentMeta(data.label);
+  result.className = `result is-visible result--${meta.cls}`;
+  labelEl.textContent = meta.id;
+  pctEl.textContent = `${(data.confidence * 100).toFixed(1)}%`;
 
-    scoreRow.innerHTML = "";
-    const entries = Object.entries(data.all_scores).sort((a, b) => b[1] - a[1]);
-    for (const [cls, score] of entries) {
-      const pct = (score * 100).toFixed(1);
-      const item = document.createElement("div");
-      item.className = "score-item";
-      item.innerHTML = `
-        <div class="score-header">
-          <span>${cls}</span>
-          <span>${pct}%</span>
-        </div>
-        <div class="bar-bg">
-          <div class="bar-fill" style="width:${pct}%; background:${colorFor(cls)}"></div>
-        </div>
-      `;
-      scoreRow.appendChild(item);
-    }
+  const rest = Object.entries(data.all_scores)
+    .filter(([cls]) => cls !== data.label)
+    .sort((a, b) => ORDER.indexOf(a[0]) - ORDER.indexOf(b[0]))
+    .map(([cls, score]) => `${sentMeta(cls).id} ${(score * 100).toFixed(0)}%`);
 
-    result.style.display = "block";
+  detailEl.textContent = rest.join(' · ');
+}
+
+btn.addEventListener('click', analyze);
+input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) analyze();
+});
+
+async function loadModelInfo() {
+  const datasetEl = document.getElementById('info-dataset');
+  const modelEl = document.getElementById('info-model');
+  const featuresEl = document.getElementById('info-features');
+  const accuracyEl = document.getElementById('info-accuracy');
+  const noteEl = document.getElementById('info-note');
+
+  try {
+    const res = await fetch('/model-info');
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+
+    const ds = data.dataset;
+    const feat = data.features;
+    const acc = data.metrics && typeof data.metrics.accuracy === 'number'
+      ? `${(data.metrics.accuracy * 100).toFixed(1)}%`
+      : '—';
+
+    modelEl.textContent = data.model_name || '—';
+    datasetEl.textContent = ds ? `${ds.total_comments ?? '?'} komentar` : '—';
+    featuresEl.textContent = feat ? feat.method : '—';
+    accuracyEl.textContent = acc;
+    noteEl.textContent = ds ? 'Label otomatis dari model pretrained, bukan anotasi manual.' : '';
+  } catch (e) {
+    [datasetEl, modelEl, featuresEl, accuracyEl].forEach((el) => { el.textContent = '—'; });
   }
+}
 
-  btn.addEventListener("click", analyze);
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) analyze();
-  });
+loadModelInfo();
 </script>
 </body>
 </html>
