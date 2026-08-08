@@ -8,7 +8,11 @@ Klasifikasi sentimen komentar YouTube berbahasa Indonesia seputar isu pelemahan 
 
 ## Tampilan App
 
-![Dashboard](assets/process.png)
+![Dashboard](assets/dashboard.png)
+
+##Perbandingan Model
+
+![Model](assets/model.png)
 
 ## Tentang Project
 
